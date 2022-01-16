@@ -80,6 +80,13 @@ class MoviesView(Resource):
         all_movies = Movie.query.all()
         return movies_schema.dump(all_movies), 200
 
+    def post(self):
+        req_json = request.json
+        new_movie = Movie(**req_json)
+        with db.session.begin():
+            db.session.add(new_movie)
+        return "", 201
+
 
 @movie_ns.route('/<int:mid>')
 class MovieView(Resource):
@@ -90,12 +97,70 @@ class MovieView(Resource):
         except Exception:
             return "", 404
 
+    def put(self, mid: int):
+        movie = db.session.query(Movie).get(mid)
+        if not movie:
+            return "", 404
+        req_json = request.json
+
+        movie.title = req_json.get("title")
+        movie.description = req_json.get("description")
+        movie.trailer = req_json.get("trailer")
+        movie.year = req_json.get("year")
+        movie.rating = req_json.get("rating")
+        movie.genre_id = req_json.get("genre_id")
+        movie.director_id = req_json.get("director_id")
+
+        db.session.add(movie)
+        db.session.commit()
+        return "", 204
+
+    def patch(self, mid: int):
+        movie = db.session.query(Movie).get(mid)
+        if not movie:
+            return "", 404
+        req_json = request.json
+
+        if "title" in req_json:
+            movie.title = req_json.get("title")
+        if "description" in req_json:
+            movie.description = req_json.get("description")
+        if "trailer" in req_json:
+            movie.trailer = req_json.get("trailer")
+        if "year" in req_json:
+            movie.year = req_json.get("year")
+        if "rating" in req_json:
+            movie.rating = req_json.get("rating")
+        if "genre_id" in req_json:
+            movie.genre_id = req_json.get("genre_id")
+        if "director_id" in req_json:
+            movie.director_id = req_json.get("director_id")
+
+        db.session.add(movie)
+        db.session.commit()
+        return "", 204
+
+    def delete(self, mid: int):
+        movie = db.session.query(Movie).get(mid)
+        if not movie:
+            return "", 404
+        db.session.delete(movie)
+        db.session.commit()
+        return "", 204
+
 
 @director_ns.route('/')
 class DirectorsView(Resource):
     def get(self):
         all_directors = Director.query.all()
         return directors_schema.dump(all_directors), 200
+
+    def post(self):
+        req_json = request.json
+        new_director = Director(**req_json)
+        with db.session.begin():
+            db.session.add(new_director)
+        return "", 201
 
 
 @director_ns.route('/<int:did>')
@@ -107,12 +172,47 @@ class DirectorView(Resource):
         except Exception:
             return "", 404
 
+    def put(self, did: int):
+        director = db.session.query(Director).get(did)
+        if not director:
+            return "", 404
+        req_json = request.json
+        director.name = req_json.get("name")
+        db.session.add(director)
+        db.session.commit()
+        return "", 204
+
+    def patch(self, did: int):
+        director = db.session.query(Director).get(did)
+        if not director:
+            return "", 404
+        req_json = request.json
+        if "name" in req_json:
+            director.name = req_json.get("name")
+        db.session.add(director)
+        db.session.commit()
+        return "", 204
+
+    def delete(self, did: int):
+        director = db.session.query(Director).get(did)
+        if not director:
+            return "", 404
+        db.session.delete(director)
+        db.session.commit()
+        return "", 204
 
 @genre_ns.route('/')
 class GenresView(Resource):
     def get(self):
         all_genres = Genre.query.all()
         return genres_schema.dump(all_genres), 200
+
+    def post(self):
+        req_json = request.json
+        new_genre = Genre(**req_json)
+        with db.session.begin():
+            db.session.add(new_genre)
+        return "", 201
 
 
 @genre_ns.route('/<int:gid>')
@@ -123,6 +223,35 @@ class GenreView(Resource):
             return genre_schema.dump(genre), 200
         except Exception:
             return "", 404
+
+    def put(self, gid: int):
+        genre = db.session.query(Genre).get(gid)
+        if not genre:
+            return "", 404
+        req_json = request.json
+        genre.name = req_json.get("name")
+        db.session.add(genre)
+        db.session.commit()
+        return "", 204
+
+    def patch(self, gid: int):
+        genre = db.session.query(Genre).get(gid)
+        if not genre:
+            return "", 404
+        req_json = request.json
+        if "name" in req_json:
+            genre.name = req_json.get("name")
+        db.session.add(genre)
+        db.session.commit()
+        return "", 204
+
+    def delete(self, gid: int):
+        genre = db.session.query(Genre).get(gid)
+        if not genre:
+            return "", 404
+        db.session.delete(genre)
+        db.session.commit()
+        return "", 204
 
 if __name__ == '__main__':
     app.run(debug=True)
