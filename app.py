@@ -77,8 +77,17 @@ genre_ns = api.namespace('genres')
 @movie_ns.route('/')
 class MoviesView(Resource):
     def get(self):
-        all_movies = Movie.query.all()
-        return movies_schema.dump(all_movies), 200
+        director_id = request.args.get('director_id')
+        genre_id = request.args.get('genre_id')
+        result = Movie.query
+        if director_id:
+            result = result.filter(Movie.director_id == director_id)
+        if genre_id:
+            result = result.filter(Movie.genre_id == genre_id)
+        if director_id and genre_id:
+            result = result.filter(Movie.director_id == director_id, Movie.genre_id == genre_id)
+        result = result.all()
+        return movies_schema.dump(result), 200
 
     def post(self):
         req_json = request.json
@@ -101,52 +110,55 @@ class MovieView(Resource):
         movie = db.session.query(Movie).get(mid)
         if not movie:
             return "", 404
-        req_json = request.json
+        else:
+            req_json = request.json
 
-        movie.title = req_json.get("title")
-        movie.description = req_json.get("description")
-        movie.trailer = req_json.get("trailer")
-        movie.year = req_json.get("year")
-        movie.rating = req_json.get("rating")
-        movie.genre_id = req_json.get("genre_id")
-        movie.director_id = req_json.get("director_id")
+            movie.title = req_json.get("title")
+            movie.description = req_json.get("description")
+            movie.trailer = req_json.get("trailer")
+            movie.year = req_json.get("year")
+            movie.rating = req_json.get("rating")
+            movie.genre_id = req_json.get("genre_id")
+            movie.director_id = req_json.get("director_id")
 
-        db.session.add(movie)
-        db.session.commit()
-        return "", 204
+            db.session.add(movie)
+            db.session.commit()
+            return "", 204
 
     def patch(self, mid: int):
         movie = db.session.query(Movie).get(mid)
         if not movie:
             return "", 404
-        req_json = request.json
+        else:
+            req_json = request.json
 
-        if "title" in req_json:
-            movie.title = req_json.get("title")
-        if "description" in req_json:
-            movie.description = req_json.get("description")
-        if "trailer" in req_json:
-            movie.trailer = req_json.get("trailer")
-        if "year" in req_json:
-            movie.year = req_json.get("year")
-        if "rating" in req_json:
-            movie.rating = req_json.get("rating")
-        if "genre_id" in req_json:
-            movie.genre_id = req_json.get("genre_id")
-        if "director_id" in req_json:
-            movie.director_id = req_json.get("director_id")
+            if "title" in req_json:
+                movie.title = req_json.get("title")
+            if "description" in req_json:
+                movie.description = req_json.get("description")
+            if "trailer" in req_json:
+                movie.trailer = req_json.get("trailer")
+            if "year" in req_json:
+                movie.year = req_json.get("year")
+            if "rating" in req_json:
+                movie.rating = req_json.get("rating")
+            if "genre_id" in req_json:
+                movie.genre_id = req_json.get("genre_id")
+            if "director_id" in req_json:
+                movie.director_id = req_json.get("director_id")
 
-        db.session.add(movie)
-        db.session.commit()
-        return "", 204
+            db.session.add(movie)
+            db.session.commit()
+            return "", 204
 
     def delete(self, mid: int):
         movie = db.session.query(Movie).get(mid)
         if not movie:
             return "", 404
-        db.session.delete(movie)
-        db.session.commit()
-        return "", 204
+        else:
+            db.session.delete(movie)
+            db.session.commit()
+            return "", 204
 
 
 @director_ns.route('/')
@@ -176,30 +188,33 @@ class DirectorView(Resource):
         director = db.session.query(Director).get(did)
         if not director:
             return "", 404
-        req_json = request.json
-        director.name = req_json.get("name")
-        db.session.add(director)
-        db.session.commit()
-        return "", 204
+        else:
+            req_json = request.json
+            director.name = req_json.get("name")
+            db.session.add(director)
+            db.session.commit()
+            return "", 204
 
     def patch(self, did: int):
         director = db.session.query(Director).get(did)
         if not director:
             return "", 404
-        req_json = request.json
-        if "name" in req_json:
-            director.name = req_json.get("name")
-        db.session.add(director)
-        db.session.commit()
-        return "", 204
+        else:
+            req_json = request.json
+            if "name" in req_json:
+                director.name = req_json.get("name")
+            db.session.add(director)
+            db.session.commit()
+            return "", 204
 
     def delete(self, did: int):
         director = db.session.query(Director).get(did)
         if not director:
             return "", 404
-        db.session.delete(director)
-        db.session.commit()
-        return "", 204
+        else:
+            db.session.delete(director)
+            db.session.commit()
+            return "", 204
 
 @genre_ns.route('/')
 class GenresView(Resource):
@@ -228,30 +243,33 @@ class GenreView(Resource):
         genre = db.session.query(Genre).get(gid)
         if not genre:
             return "", 404
-        req_json = request.json
-        genre.name = req_json.get("name")
-        db.session.add(genre)
-        db.session.commit()
-        return "", 204
+        else:
+            req_json = request.json
+            genre.name = req_json.get("name")
+            db.session.add(genre)
+            db.session.commit()
+            return "", 204
 
     def patch(self, gid: int):
         genre = db.session.query(Genre).get(gid)
         if not genre:
             return "", 404
-        req_json = request.json
-        if "name" in req_json:
-            genre.name = req_json.get("name")
-        db.session.add(genre)
-        db.session.commit()
-        return "", 204
+        else:
+            req_json = request.json
+            if "name" in req_json:
+                genre.name = req_json.get("name")
+            db.session.add(genre)
+            db.session.commit()
+            return "", 204
 
     def delete(self, gid: int):
         genre = db.session.query(Genre).get(gid)
         if not genre:
             return "", 404
-        db.session.delete(genre)
-        db.session.commit()
-        return "", 204
+        else:
+            db.session.delete(genre)
+            db.session.commit()
+            return "", 204
 
 if __name__ == '__main__':
     app.run(debug=True)
